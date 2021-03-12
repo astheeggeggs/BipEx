@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Summary of QC filtering</title>
+
+<script src="site_libs/header-attrs-2.3/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="my-style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"><div><img src="bipex_white.svg" style="width:18px;height:18px;"/> BipEx: Bipolar Exomes</div></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="qc.html">Detailed QC</a>
+</li>
+<li>
+  <a href="qc_summary.html">QC Summary</a>
+</li>
+<li>
+  <a href="analyses.html">Analyses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/astheeggeggs/BipEx">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Summary of QC filtering</h1>
+
+</div>
+
+
+<p><br></p>
+<div id="variant-filtering" class="section level2">
+<h2>Variant filtering</h2>
+<p>For our QC pipeline, we first read in the .vcf file, split multiallelics, and remove sites with more than 6 alleles. After splitting muliallelics in the .vcf file containing 29,911,479 variants and restricting to these sites, we have 37,344,246 variants.</p>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Variants
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Variants with &lt; 7 alleles
+</td>
+<td style="text-align:right;">
+37,344,246
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Failing VQSR
+</td>
+<td style="text-align:right;">
+100,742
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+In LCRs
+</td>
+<td style="text-align:right;">
+1,215,218
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 3.30%">3.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Outside padded target interval
+</td>
+<td style="text-align:right;">
+27,119,165
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 72.60%">72.6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Invariant sites after initial variant and genotype filters
+</td>
+<td style="text-align:right;">
+3,117,961
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 8.30%">8.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Invariant sites after sample filters
+</td>
+<td style="text-align:right;">
+1,051,421
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 2.80%">2.8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Overall variant call rate &lt; 0.97
+</td>
+<td style="text-align:right;">
+737,072
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 2.00%">2.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Overall variant case call rate &lt; 0.97
+</td>
+<td style="text-align:right;">
+716,709
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 1.90%">1.9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Overall variant control call rate &lt; 0.97
+</td>
+<td style="text-align:right;">
+743,659
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 2.00%">2.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Difference between case and control variant call rate &lt; 0.02
+</td>
+<td style="text-align:right;">
+232,341
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.60%">0.6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Variants failing HWE filter
+</td>
+<td style="text-align:right;">
+1,083,479
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 2.90%">2.9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Variants remaining after all filters
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+5,104,759
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 13.70%">13.7</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+</div>
+<div id="sample-filtering" class="section level2">
+<h2>Sample filtering</h2>
+<p><br></p>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Initial samples in vcf
+</td>
+<td style="text-align:right;">
+39,618
+</td>
+<td style="text-align:right;">
+16,486
+</td>
+<td style="text-align:right;">
+17,212
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Unable to obtain both phenotype and sequence information
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.00%">0.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Unknown phenotype
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.10%">0.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Low coverage or high contamination
+</td>
+<td style="text-align:right;">
+133
+</td>
+<td style="text-align:right;">
+72
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sample call rate &lt; 0.93
+</td>
+<td style="text-align:right;">
+185
+</td>
+<td style="text-align:right;">
+124
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.50%">0.5</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+% FREEMIX contamination &gt; 0.02
+</td>
+<td style="text-align:right;">
+268
+</td>
+<td style="text-align:right;">
+146
+</td>
+<td style="text-align:right;">
+104
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.70%">0.7</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+% chimeric reads &gt; 0.015
+</td>
+<td style="text-align:right;">
+152
+</td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.40%">0.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mean DP &lt; 30
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.10%">0.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mean GQ &lt; 55
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.10%">0.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Samples with sex swap
+</td>
+<td style="text-align:right;">
+238
+</td>
+<td style="text-align:right;">
+147
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.60%">0.6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Related samples for removal
+</td>
+<td style="text-align:right;">
+1,716
+</td>
+<td style="text-align:right;">
+792
+</td>
+<td style="text-align:right;">
+688
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 4.30%">4.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCA based filters
+</td>
+<td style="text-align:right;">
+2,880
+</td>
+<td style="text-align:right;">
+1,120
+</td>
+<td style="text-align:right;">
+1,422
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 7.30%">7.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within batch Ti/Tv ratio outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within batch Het/HomVar ratio outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+150
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.40%">0.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within batch Insertion/Deletion ratio outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+93
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.20%">0.2</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within location n singletons outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+443
+</td>
+<td style="text-align:right;">
+151
+</td>
+<td style="text-align:right;">
+236
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 1.10%">1.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after final sample filters
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+33,527
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+13,933
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,422
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 84.60%">84.6</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+</div>
+<div id="summary-of-sample-filtering" class="section level2">
+<h2>Summary of sample filtering</h2>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Initial samples in vcf
+</td>
+<td style="text-align:right;">
+39,618
+</td>
+<td style="text-align:right;">
+16,486
+</td>
+<td style="text-align:right;">
+17,212
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Unable to obtain both phenotype and sequence information
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.00%">0.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Unknown phenotype
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.10%">0.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Low coverage or high contamination
+</td>
+<td style="text-align:right;">
+133
+</td>
+<td style="text-align:right;">
+72
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Below sample metric thresholds
+</td>
+<td style="text-align:right;">
+557
+</td>
+<td style="text-align:right;">
+276
+</td>
+<td style="text-align:right;">
+252
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 1.40%">1.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Samples with sex swap
+</td>
+<td style="text-align:right;">
+238
+</td>
+<td style="text-align:right;">
+147
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.60%">0.6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Related samples for removal
+</td>
+<td style="text-align:right;">
+1,716
+</td>
+<td style="text-align:right;">
+792
+</td>
+<td style="text-align:right;">
+688
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 4.30%">4.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCA based filters
+</td>
+<td style="text-align:right;">
+2,880
+</td>
+<td style="text-align:right;">
+1,120
+</td>
+<td style="text-align:right;">
+1,422
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 7.30%">7.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Outliers in batch-specific sample metrics
+</td>
+<td style="text-align:right;">
+771
+</td>
+<td style="text-align:right;">
+293
+</td>
+<td style="text-align:right;">
+374
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 1.90%">1.9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after final sample filters
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+33,527
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+13,933
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,422
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 84.60%">84.6</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

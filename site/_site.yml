@@ -1,0 +1,17 @@
+name: "BipEx"
+output_dir: "../docs"
+navbar:
+  title: '<div><img src="bipex_white.svg" style="width:18px;height:18px;"/> BipEx: Bipolar Exomes</div>'
+  left:
+    - text: "Detailed QC"
+      href: qc.html
+    - text: "QC Summary"
+      href: qc_summary.html
+    - text: "Analyses"
+      href: analyses.html
+  right:
+    - icon: fa-github
+      href: https://github.com/astheeggeggs/BipEx
+output:
+  html_document:
+    self_contained: true

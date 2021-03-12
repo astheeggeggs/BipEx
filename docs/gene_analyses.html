@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Gene level analyses</title>
+
+<script src="site_libs/header-attrs-2.3/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="my-style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"><div><img src="bipex_white.svg" style="width:18px;height:18px;"/> BipEx: Bipolar Exomes</div></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="qc.html">Detailed QC</a>
+</li>
+<li>
+  <a href="qc_summary.html">QC Summary</a>
+</li>
+<li>
+  <a href="analyses.html">Analyses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/astheeggeggs/BipEx">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Gene level analyses</h1>
+
+</div>
+
+
+<p><br> We ran gene based tests to look for increased burden of damaging rare variation in cases. First, we annotate variants in the dataset as either ‘synonymous’, ‘other-missense’, ‘damaging-missense’, and ‘PTV’. Here, we define a variant as ‘damaging-missense’ if both the polyphen prediction is ‘probably damaging’ and the SIFT prediction is ‘deleterious’. Then, filtering variants to each of these consequence categories, we performed a number of tests to check for presense of enrichment of rare variation (minor allele count (MAC) <span class="math inline">\(\leq\)</span> 5).</p>
+<p>Throughout we show QQ plots next to the gene-based manhattan plots of our results. For each consequence category, we display the results before and after the further restriction of variants not being present in the gnomAD non-psych samples. Non-damaging consequence categories are also included as negative controls. The top 20 genes in each plot by observed <span class="math inline">\(p\)</span>-value are labelled.</p>
+<p>For the damaging missense and PTV tests, we also include Manhattan plots.</p>
+<p>Results for the Fisher’s exact tests of MAC <span class="math inline">\(\leq\)</span> 5 not in the gnomAD non-psych samples can be explored in our <a href="http://bipex.broadinstitute.org/">browser</a>, take a look at in the ‘Gene Result’ table on the gene specific pages, or <a href="http://bipex.broadinstitute.org/results">here</a> for all the genes. We applied the above tests to bipolar disorder (comprising bipolar disorder without a fine subclassification, bipolar disorder 1, bipolar disorder 2, and bipolar discorder not otherwise specificied), bipolar disorder 1, bipolar disorder 2, and bipolar disorder with and without psychosis. These plots are included in our paper, in Figure 3 and Figures S9-12,14-5.</p>
+<div id="fishers-exact-test" class="section level2">
+<h2>Fisher’s exact test</h2>
+<p>We ran a Fisher’s exact test for each gene, grouping together all cohorts. The expected distribution of <span class="math inline">\(p\)</span>-values is determined via permuation.</p>
+<div id="bipolar-disorder" class="section level3">
+<h3>Bipolar Disorder</h3>
+<div id="synonymous" class="section level4">
+<h4>Synonymous</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_synonymous.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="other-missense" class="section level4">
+<h4>Other missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_other_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="damaging-missense" class="section level4">
+<h4>Damaging missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_damaging_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_damaging_missense_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="ptv" class="section level4">
+<h4>PTV</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_ptv.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" /> <img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_ptv_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<p><br></p>
+</div>
+</div>
+<div id="bipolar-disorder-1" class="section level3">
+<h3>Bipolar Disorder 1</h3>
+<div id="synonymous-1" class="section level4">
+<h4>Synonymous</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_synonymous.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="other-missense-1" class="section level4">
+<h4>Other missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_other_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="damaging-missense-1" class="section level4">
+<h4>Damaging missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_damaging_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP1_damaging_missense_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="ptv-1" class="section level4">
+<h4>PTV</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_ptv.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" /> <img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP1_ptv_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<p><br></p>
+</div>
+</div>
+<div id="bipolar-disorder-2" class="section level3">
+<h3>Bipolar Disorder 2</h3>
+<div id="synonymous-2" class="section level4">
+<h4>Synonymous</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_synonymous.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="other-missense-2" class="section level4">
+<h4>Other missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_other_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="damaging-missense-2" class="section level4">
+<h4>Damaging missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_damaging_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP2_damaging_missense_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="ptv-2" class="section level4">
+<h4>PTV</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_ptv.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" /> <img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP2_ptv_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<p><br></p>
+</div>
+</div>
+<div id="bipolar-disorder-with-psychosis" class="section level3">
+<h3>Bipolar Disorder, with Psychosis</h3>
+<div id="synonymous-3" class="section level4">
+<h4>Synonymous</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_synonymous.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="other-missense-3" class="section level4">
+<h4>Other missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_other_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="damaging-missense-3" class="section level4">
+<h4>Damaging missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_damaging_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BPPSY_damaging_missense_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="ptv-3" class="section level4">
+<h4>PTV</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_ptv.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" /> <img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BPPSY_ptv_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<p><br></p>
+</div>
+</div>
+<div id="bipolar-disorder-without-psychosis" class="section level3">
+<h3>Bipolar Disorder, without Psychosis</h3>
+<div id="synonymous-4" class="section level4">
+<h4>Synonymous</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_synonymous.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="other-missense-4" class="section level4">
+<h4>Other missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_other_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="damaging-missense-4" class="section level4">
+<h4>Damaging missense</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_damaging_missense.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_no_PSY_damaging_missense_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+</div>
+<div id="ptv-4" class="section level4">
+<h4>PTV</h4>
+<img src="analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_ptv.jpg" width="54.87%" style="float:left" style="display: block; margin: auto;" /> <img src="analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_no_PSY_ptv_manhattan.jpg" width="100%" style="display: block; margin: auto;" />
+<div style="clear: both;">
+
+</div>
+<p><br></p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

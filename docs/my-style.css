@@ -1,0 +1,48 @@
+/* Custom Styling */
+
+/* Core Styling */
+
+body {
+    font-family: Helvetica, sans-serif;
+    font-size 14px;
+    line-height: 1.42857143;
+    color: #333;
+}
+
+h1,h2,h3,h4,h5,h6{
+  font-family: Helvetica, sans-serif;
+}
+
+/*html {
+  font-family: Helvetica, sans-serif;
+}
+
+pre, code, kbd, samp {
+  font-family: monospace;
+}
+
+input, button, select, optgroup, textarea {
+  font-family: Helvetica, sans-serif;
+}
+
+.tooltip {
+  font-family: Helvetica, sans-serif;
+}
+
+.popover {
+  font-family: Helvetica, sans-serif;
+}
+
+.text-monospace {
+  font-family: monospace;
+}*/
+
+
+/* Navbar Styling */
+
+/* navbar */
+
+.navbar-default {
+  background-color: #c24100;
+  border-color: #1495fe;
+}

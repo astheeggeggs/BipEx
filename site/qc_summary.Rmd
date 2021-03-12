@@ -1,0 +1,158 @@
+---
+title: "Summary of QC filtering"
+output: 
+  html_document:
+    theme: united
+    highlight: tango
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    css: "my-style.css"
+---
+ <br>
+
+## Variant filtering
+
+For our QC pipeline, we first read in the .vcf file, split multiallelics, and remove sites with more than 6 alleles. After splitting muliallelics in the .vcf file containing 29,911,479 variants and restricting to these sites, we have 37,344,246 variants.
+
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+require(plotly)
+require(crosstalk)
+require(data.table)
+require(dplyr)
+require(DT)
+require(kableExtra)
+require(formattable)
+require(htmltools)
+source("../scripts_BipEx/QC_BipEx/r_functions_and_parameters/r_options_BipEx.r")
+options(dplyr.summarise.inform=F)
+```
+
+```{r variant_table, echo=FALSE, out.width = '100%', warning=FALSE}
+# dt <- fread('gsutil cat gs://dalio_bipolar_w1_w2_hail_02/data/summary_variant_table.tsv', header=FALSE)
+# names(dt) <- c("Filter", "Variants")
+# dt <- dt[2:nrow(dt),]
+# dt <- dt[-6,]
+# dt[5,1] <- "Invariant sites after initial variant and genotype filters"
+# dt[5,2] <- dt[5,2] - dt[6,2]
+# dt[6,1] <- "Variants after initial filter"
+# dt[,"%"] <- round(100 * dt$Variants/dt$Variants[1], 1)
+
+dt_1 <- fread('../variants_BipEx/02_summary_variant_table.tsv')
+dt_2 <- fread('../samples_BipEx/14_variant_count.tsv', header=FALSE)
+names(dt_2) <- c("Filter", "Variants")
+
+dt <- rbind(dt_1[1:(nrow(dt_1)-1),], dt_2[2:nrow(dt_2),])
+dt[nrow(dt),1] <- "Variants remaining after all filters"
+
+dt[,"%"] <- round(100 * dt$Variants/dt$Variants[1], 1)
+
+dt %>% mutate("%" = color_bar("#0081c2")(unlist(dt[,'%']))) %>% 
+  kable("html", escape=FALSE, align=c('l', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
+  row_spec(nrow(dt), bold = T, color = "white", background = "#c24100") %>% 
+  kable_styling('hover')
+
+```
+
+<br>
+
+## Sample filtering
+
+<br>
+
+```{r sample_summary_table, echo=FALSE, out.width = '100%', warning=FALSE}
+
+# Initial sample counts
+dt_tmp <- fread('../samples_BipEx/03_initial_sample_count.tsv', header=FALSE)
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+dt <- dt_tmp[1:(nrow(dt_tmp)-1),]
+
+# First set of filters
+dt_tmp <- fread('../samples_BipEx/03_sample_count.tsv', header=FALSE)
+dt_tmp <- dt_tmp[2:(nrow(dt_tmp)-1),]
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+dt <- rbind(dt, dt_tmp)
+
+# Sex check
+dt <- rbind(dt, fread("../samples_BipEx/05_sexcheck_sample_count.tsv")[2,1:4])
+
+# Relatedness check
+dt <- rbind(dt, fread("../samples_BipEx/06_ibd_sample_count.tsv")[2, 1:4])
+
+# PCA based filters
+# This will likely break in the future and should be gone through carefully.
+dt_tmp <- fread('../samples_BipEx/15_sample_count.tsv', header=FALSE)[1, 2:4]
+dt_tmp <- fread("../samples_BipEx/06_ibd_sample_count.tsv")[3, 2:4] - dt_tmp
+dt_tmp <- cbind("PCA based filters", dt_tmp)
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+
+dt <- rbind(dt, dt_tmp)
+
+# Final sample filters
+dt_tmp <- fread('../samples_BipEx/15_sample_count.tsv', header=FALSE)
+dt_tmp <- dt_tmp[2:nrow(dt_tmp),]
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+
+dt <- rbind(dt, dt_tmp)
+dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
+
+dt %>% mutate("%" = color_bar("#0081c2")(unlist(dt[,'%']))) %>% 
+  kable("html", escape=FALSE, align=c('l', 'r', 'r', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
+  row_spec(nrow(dt), bold = T, color = "white", background = "#c24100") %>% 
+  kable_styling('hover')
+
+```
+
+<br>
+
+## Summary of sample filtering
+
+```{r sample_summary_of_summary_table, echo=FALSE, out.width = '100%', warning=FALSE}
+
+# Initial sample counts
+dt_tmp <- fread('../samples_BipEx/03_initial_sample_count.tsv', header=FALSE)
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+dt <- dt_tmp[1:(nrow(dt_tmp)-1),]
+
+# First set of filters
+dt_tmp <- fread('../samples_BipEx/03_sample_count.tsv', header=FALSE)
+dt_tmp <- cbind('Below sample metric thresholds', dt_tmp[1,2:ncol(dt_tmp)] - dt_tmp[nrow(dt_tmp),2:ncol(dt_tmp)])
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+dt <- rbind(dt, dt_tmp)
+
+# Sex check
+dt <- rbind(dt, fread("../samples_BipEx/05_sexcheck_sample_count.tsv")[2,1:4])
+
+# Relatedness check
+dt <- rbind(dt, fread("../samples_BipEx/06_ibd_sample_count.tsv")[2, 1:4])
+
+# PCA based filters
+# This will likely break in the future and should be gone through carefully.
+dt_tmp <- fread('../samples_BipEx/15_sample_count.tsv', header=FALSE)[1, 2:4]
+dt_tmp <- fread("../samples_BipEx/06_ibd_sample_count.tsv")[3, 2:4] - dt_tmp
+dt_tmp <- cbind("PCA based filters", dt_tmp)
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+
+dt <- rbind(dt, dt_tmp)
+
+# Final sample filters
+dt_tmp <- fread('../samples_BipEx/15_sample_count.tsv', header=FALSE)
+dt_tmp <- rbind(cbind('Outliers in batch-specific sample metrics', dt_tmp[1,2:ncol(dt_tmp)] - dt_tmp[nrow(dt_tmp),2:ncol(dt_tmp)]),
+  dt_tmp[nrow(dt_tmp),])
+names(dt_tmp) <- c("Filter", "Samples", "Bipolar cases", "Controls")
+
+dt <- rbind(dt, dt_tmp)
+dt[,"%"] <- round(100 * dt$Samples/dt$Samples[1], 1)
+
+dt %>% mutate("%" = color_bar("#0081c2")(unlist(dt[,'%']))) %>% 
+  kable("html", escape=FALSE, align=c('l', 'r', 'r', 'r', 'r'), format.args = list(big.mark = ",")) %>% row_spec(0,bold=TRUE) %>%
+  row_spec(nrow(dt), bold = T, color = "white", background = "#c24100") %>% 
+  kable_styling('hover')
+
+```
+
+

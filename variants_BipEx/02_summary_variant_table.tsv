@@ -1,0 +1,7 @@
+Filter	Variants
+Variants with < 7 alleles	37344246
+Failing VQSR	100742
+In LCRs	1215218
+Outside padded target interval	27119165
+Invariant sites after initial variant and genotype filters	3117961
+Variants after initial filtering	6829373

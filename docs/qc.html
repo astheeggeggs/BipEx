@@ -1,0 +1,4709 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Quality control pipeline</title>
+
+<script src="site_libs/header-attrs-2.3/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="my-style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"><div><img src="bipex_white.svg" style="width:18px;height:18px;"/> BipEx: Bipolar Exomes</div></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="qc.html">Detailed QC</a>
+</li>
+<li>
+  <a href="qc_summary.html">QC Summary</a>
+</li>
+<li>
+  <a href="analyses.html">Analyses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/astheeggeggs/BipEx">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Quality control pipeline</h1>
+
+</div>
+
+
+<p><br> On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying <a href="https://github.com/astheeggeggs/BipEx/tree/master/scripts_BipEx/QC_BipEx">code</a> and a <a href="https://github.com/astheeggeggs/BipEx/blob/master/scripts_BipEx/QC_BipEx/QC_pipeline_writeup/pipeline_writeup.tex">document</a> summarising the pipeline can be found on the BipEx github <a href="https://github.com/astheeggeggs/BipEx">repository</a>.</p>
+<p>We first summarise the collection of samples, splitting across cohorts and subtypes. In addtition to Bipolar cases, we also a collection of Schizophrenia cases that will serve as positive controls for our PTV burden analyses.</p>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizoaffective
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizophrenia
+</th>
+<th style="text-align:right;font-weight: bold;">
+Other
+</th>
+<th style="text-align:right;font-weight: bold;">
+Unknown
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Aberdeen, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+564
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+331
+</td>
+<td style="text-align:right;">
+896
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Amsterdam, NED
+</td>
+<td style="text-align:right;">
+1,212
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+1,611
+</td>
+<td style="text-align:right;">
+2,920
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Baltimore, USA
+</td>
+<td style="text-align:right;">
+380
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
+514
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+3,449
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3,498
+</td>
+<td style="text-align:right;">
+6,999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cambridge, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,851
+</td>
+<td style="text-align:right;">
+2,851
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+2,442
+</td>
+<td style="text-align:right;">
+68
+</td>
+<td style="text-align:right;">
+2,990
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1,106
+</td>
+<td style="text-align:right;">
+6,624
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dublin, IRE
+</td>
+<td style="text-align:right;">
+180
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+232
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Edinburgh, UK
+</td>
+<td style="text-align:right;">
+885
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+304
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+1,259
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+1,909
+</td>
+<td style="text-align:right;">
+157
+</td>
+<td style="text-align:right;">
+1,595
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1,203
+</td>
+<td style="text-align:right;">
+4,864
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+5,160
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5,541
+</td>
+<td style="text-align:right;">
+10,702
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Umea, SWE
+</td>
+<td style="text-align:right;">
+472
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+459
+</td>
+<td style="text-align:right;">
+931
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Wurzburg, GER
+</td>
+<td style="text-align:right;">
+397
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+414
+</td>
+<td style="text-align:right;">
+825
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,486
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+316
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+5,483
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+87
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+32
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+17,213
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+39,617
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>Within the collection of Bipolar cases, we have subtype information: Bipolar 1, and Bipolar 2. Further splitting the cases and labelling Bipolar cases for whom we do not have subtype information available, we obtain the following numbers of samples in each subcategory:</p>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder 1
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder 2
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder NOS
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizoaffective
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Total (including schizoaffective)
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Aberdeen, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+331
+</td>
+<td style="text-align:right;">
+331
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Amsterdam, NED
+</td>
+<td style="text-align:right;">
+1,032
+</td>
+<td style="text-align:right;">
+169
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+1,233
+</td>
+<td style="text-align:right;">
+1,611
+</td>
+<td style="text-align:right;">
+2,844
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Baltimore, USA
+</td>
+<td style="text-align:right;">
+358
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+380
+</td>
+<td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
+506
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+2,122
+</td>
+<td style="text-align:right;">
+390
+</td>
+<td style="text-align:right;">
+576
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+3,501
+</td>
+<td style="text-align:right;">
+3,498
+</td>
+<td style="text-align:right;">
+6,999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cambridge, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,851
+</td>
+<td style="text-align:right;">
+2,851
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+1,518
+</td>
+<td style="text-align:right;">
+772
+</td>
+<td style="text-align:right;">
+67
+</td>
+<td style="text-align:right;">
+68
+</td>
+<td style="text-align:right;">
+2,510
+</td>
+<td style="text-align:right;">
+1,106
+</td>
+<td style="text-align:right;">
+3,616
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dublin, IRE
+</td>
+<td style="text-align:right;">
+180
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+191
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+200
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Edinburgh, UK
+</td>
+<td style="text-align:right;">
+368
+</td>
+<td style="text-align:right;">
+114
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+891
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+955
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+1,309
+</td>
+<td style="text-align:right;">
+372
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+157
+</td>
+<td style="text-align:right;">
+2,066
+</td>
+<td style="text-align:right;">
+1,203
+</td>
+<td style="text-align:right;">
+3,269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+2,364
+</td>
+<td style="text-align:right;">
+1,753
+</td>
+<td style="text-align:right;">
+905
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5,161
+</td>
+<td style="text-align:right;">
+5,541
+</td>
+<td style="text-align:right;">
+10,702
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Umea, SWE
+</td>
+<td style="text-align:right;">
+320
+</td>
+<td style="text-align:right;">
+149
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+472
+</td>
+<td style="text-align:right;">
+459
+</td>
+<td style="text-align:right;">
+931
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Wurzburg, GER
+</td>
+<td style="text-align:right;">
+216
+</td>
+<td style="text-align:right;">
+159
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+397
+</td>
+<td style="text-align:right;">
+414
+</td>
+<td style="text-align:right;">
+811
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+9,787
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,887
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,583
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+316
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,802
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+17,213
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+34,015
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>Additionally, for a subset of the available phenotype data, we also have information regarding psychosis diagnosis and age of onset according to three definitions and two age groupings. Restricting to the subset of cohorts for which we have psychosis information, the breakdown is as follows:</p>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder with Psychosis
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder without Psychosis
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+667
+</td>
+<td style="text-align:right;">
+172
+</td>
+<td style="text-align:right;">
+839
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+1,168
+</td>
+<td style="text-align:right;">
+777
+</td>
+<td style="text-align:right;">
+1,945
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+1,095
+</td>
+<td style="text-align:right;">
+584
+</td>
+<td style="text-align:right;">
+1,679
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+2,161
+</td>
+<td style="text-align:right;">
+2,394
+</td>
+<td style="text-align:right;">
+4,555
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Wurzburg, GER
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+338
+</td>
+<td style="text-align:right;">
+397
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+5,150
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+4,265
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+9,415
+</td>
+</tr>
+</tbody>
+</table>
+<p>The age of onset categories we have data for are: age at first impairment, age at first symptoms, and age at first diagnosis. Each of these are then binned into two different partitions ‘24’ and ‘40’, according to the following rules:</p>
+<p><br></p>
+<div id="partition" class="section level4">
+<h4>‘24’ partition</h4>
+<p>Age of onset &lt; 12 <span class="math inline">\(\rightarrow\)</span> 0</p>
+<p>Age of onset &lt; 12-24 <span class="math inline">\(\rightarrow\)</span> 1</p>
+<p>Age of onset &gt; 24 <span class="math inline">\(\rightarrow\)</span> 2</p>
+<p><br></p>
+</div>
+<div id="partition-1" class="section level4">
+<h4>‘40’ partition</h4>
+<p>Age of onset &lt; 18 <span class="math inline">\(\rightarrow\)</span> 0</p>
+<p>Age of onset &lt; 18-40 <span class="math inline">\(\rightarrow\)</span> 1</p>
+<p>Age of onset &gt; 40 <span class="math inline">\(\rightarrow\)</span> 2</p>
+<p><br></p>
+<p>The breakdown of the age of onset categories is as follows:</p>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment ‘40’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms ‘40’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age at Diagnosis ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age at Diagnosis ‘40’
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+514
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+1,308
+</td>
+<td style="text-align:right;">
+1,308
+</td>
+<td style="text-align:right;">
+1,199
+</td>
+<td style="text-align:right;">
+1,199
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+1,808
+</td>
+<td style="text-align:right;">
+1,808
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+561
+</td>
+<td style="text-align:right;">
+561
+</td>
+<td style="text-align:right;">
+2,114
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1,927
+</td>
+<td style="text-align:right;">
+1,927
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,677
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,677
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,313
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,199
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,927
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+2,441
+</td>
+</tr>
+</tbody>
+</table>
+<p>Within each of these age of onset category splits, the age breakdown is then:</p>
+</div>
+<div id="age-at-first-impairment" class="section level4">
+<h4>Age at first impairment</h4>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &lt;12
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment 12-24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &gt;24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &lt;18
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment 18-40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &gt;40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘40’
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+80
+</td>
+<td style="text-align:right;">
+824
+</td>
+<td style="text-align:right;">
+404
+</td>
+<td style="text-align:right;">
+1,308
+</td>
+<td style="text-align:right;">
+469
+</td>
+<td style="text-align:right;">
+782
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+1,308
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+78
+</td>
+<td style="text-align:right;">
+978
+</td>
+<td style="text-align:right;">
+752
+</td>
+<td style="text-align:right;">
+1,808
+</td>
+<td style="text-align:right;">
+446
+</td>
+<td style="text-align:right;">
+1,188
+</td>
+<td style="text-align:right;">
+174
+</td>
+<td style="text-align:right;">
+1,808
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+256
+</td>
+<td style="text-align:right;">
+279
+</td>
+<td style="text-align:right;">
+561
+</td>
+<td style="text-align:right;">
+135
+</td>
+<td style="text-align:right;">
+355
+</td>
+<td style="text-align:right;">
+71
+</td>
+<td style="text-align:right;">
+561
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+184
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+2,058
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,435
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,677
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,050
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+2,325
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+302
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,677
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="age-at-first-symptoms" class="section level4">
+<h4>Age at first symptoms</h4>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &lt;12
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms 12-24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &gt;24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &lt;18
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms 18-40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &gt;40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘40’
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+215
+</td>
+<td style="text-align:right;">
+757
+</td>
+<td style="text-align:right;">
+227
+</td>
+<td style="text-align:right;">
+1,199
+</td>
+<td style="text-align:right;">
+684
+</td>
+<td style="text-align:right;">
+481
+</td>
+<td style="text-align:right;">
+34
+</td>
+<td style="text-align:right;">
+1,199
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+253
+</td>
+<td style="text-align:right;">
+1,148
+</td>
+<td style="text-align:right;">
+713
+</td>
+<td style="text-align:right;">
+2,114
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+468
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,905
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+940
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,313
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+684
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+481
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+34
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,199
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="age-at-first-diagnosis" class="section level4">
+<h4>Age at first diagnosis</h4>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &lt;12
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis 12-24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &gt;24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &lt;18
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis 18-40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &gt;40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘40’
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+224
+</td>
+<td style="text-align:right;">
+214
+</td>
+<td style="text-align:right;">
+76
+</td>
+<td style="text-align:right;">
+514
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+891
+</td>
+<td style="text-align:right;">
+976
+</td>
+<td style="text-align:right;">
+1,927
+</td>
+<td style="text-align:right;">
+408
+</td>
+<td style="text-align:right;">
+1,247
+</td>
+<td style="text-align:right;">
+272
+</td>
+<td style="text-align:right;">
+1,927
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+60
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+891
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+976
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,927
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+632
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,461
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+348
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+2,441
+</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, the split by PI was as follows:</p>
+<table class="table table-hover" style="font-size: 11px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+PI
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder 1
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder 2
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder NOS
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizoaffective
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Total (including schizoaffective)
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizophrenia
+</th>
+<th style="text-align:right;font-weight: bold;">
+Other
+</th>
+<th style="text-align:right;font-weight: bold;">
+Unknown
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Andreas Reif
+</td>
+<td style="text-align:right;">
+216
+</td>
+<td style="text-align:right;">
+159
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+397
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+414
+</td>
+<td style="text-align:right;">
+825
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Andrew McQuillin
+</td>
+<td style="text-align:right;">
+1,309
+</td>
+<td style="text-align:right;">
+372
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+157
+</td>
+<td style="text-align:right;">
+2,066
+</td>
+<td style="text-align:right;">
+1,595
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1,203
+</td>
+<td style="text-align:right;">
+4,864
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bob Yolken
+</td>
+<td style="text-align:right;">
+117
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+139
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
+273
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Danielle Posthuma
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+948
+</td>
+<td style="text-align:right;">
+949
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+David St Clair
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+564
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+331
+</td>
+<td style="text-align:right;">
+896
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Derek Morris
+</td>
+<td style="text-align:right;">
+180
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+191
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+232
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Douglas Blackwood
+</td>
+<td style="text-align:right;">
+368
+</td>
+<td style="text-align:right;">
+114
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+891
+</td>
+<td style="text-align:right;">
+304
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+64
+</td>
+<td style="text-align:right;">
+1,259
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fernando Goes
+</td>
+<td style="text-align:right;">
+241
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+241
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+241
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jordan Smoller
+</td>
+<td style="text-align:right;">
+2,122
+</td>
+<td style="text-align:right;">
+390
+</td>
+<td style="text-align:right;">
+576
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+3,501
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3,498
+</td>
+<td style="text-align:right;">
+6,999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Michael ODonovan
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+2,986
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,998
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Michael Owen
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1,106
+</td>
+<td style="text-align:right;">
+1,106
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mikael Landen
+</td>
+<td style="text-align:right;">
+2,364
+</td>
+<td style="text-align:right;">
+1,753
+</td>
+<td style="text-align:right;">
+905
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5,161
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+761
+</td>
+<td style="text-align:right;">
+5,922
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nancy Pedersen
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4,780
+</td>
+<td style="text-align:right;">
+4,780
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nick Craddock
+</td>
+<td style="text-align:right;">
+1,518
+</td>
+<td style="text-align:right;">
+772
+</td>
+<td style="text-align:right;">
+67
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+2,499
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,520
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Roel Ophoff
+</td>
+<td style="text-align:right;">
+1,032
+</td>
+<td style="text-align:right;">
+169
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+1,233
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+663
+</td>
+<td style="text-align:right;">
+1,971
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rolf Adolfsson
+</td>
+<td style="text-align:right;">
+320
+</td>
+<td style="text-align:right;">
+149
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+472
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+459
+</td>
+<td style="text-align:right;">
+931
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Willem Ouwehand
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,851
+</td>
+<td style="text-align:right;">
+2,851
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+9,787
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,887
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,583
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+316
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,802
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+5,483
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+87
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+32
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+17,213
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+39,617
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>For our QC pipeline, we first read in the <code>.vcf</code> file, split multiallelics, and remove sites with more than 6 alleles. After splitting muliallelics in the <code>.vcf</code> file containing 29,911,479 variants and restricting to these sites, we have 37,344,246 variants.</p>
+<p><br></p>
+</div>
+<div id="initial-genotype-filtering" class="section level1">
+<h1>Initial genotype filtering</h1>
+<p>Our first step (after conversion of the joint called <code>.vcf</code> file to a hail matrix table) is to remove genotypes based on the following collection of criteria:</p>
+<ul>
+<li>If homozygous reference, remove if at least one of the following is true:
+<ul>
+<li>Genotype quality <span class="math inline">\(&lt;\)</span> 20</li>
+<li>Depth <span class="math inline">\(&lt;\)</span> 10</li>
+</ul></li>
+<li>If heterozygous, at least one of the following is true:
+<ul>
+<li>(Reference allele depth + alternative allele depth) divided by total depth <span class="math inline">\(&lt;\)</span> 0.8</li>
+<li>Alternative allele depth divided by total depth <span class="math inline">\(&lt;\)</span> 0.2</li>
+<li>Reference phred-scaled genotype posterior <span class="math inline">\(&lt;\)</span> 20</li>
+<li>Depth <span class="math inline">\(&lt;\)</span> 10</li>
+</ul></li>
+<li>If homozygous variant, at least one of the following is true:
+<ul>
+<li>Alternative allele depth divided by total depth <span class="math inline">\(&lt;\)</span> 0.8</li>
+<li>Reference phred-scaled genotype posterior <span class="math inline">\(&lt;\)</span> 20</li>
+<li>Depth <span class="math inline">\(&lt;\)</span> 10</li>
+</ul></li>
+</ul>
+<p><br></p>
+</div>
+<div id="initial-variant-filtering" class="section level1">
+<h1>Initial variant filtering</h1>
+<p>Remove variants that either:</p>
+<ul>
+<li>Fall in a low complexity region</li>
+<li>Fail variant quality score recalibration (VQSR)</li>
+<li>Fall outside padded target intervals (50bp padding)</li>
+<li>Are invariant after the initial GT filter</li>
+</ul>
+<p><br></p>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Variants
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Variants with &lt; 7 alleles
+</td>
+<td style="text-align:right;">
+37,344,246
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Failing VQSR
+</td>
+<td style="text-align:right;">
+100,742
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+In LCRs
+</td>
+<td style="text-align:right;">
+1,215,218
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 3.30%">3.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Outside padded target interval
+</td>
+<td style="text-align:right;">
+27,119,165
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 72.60%">72.6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Invariant sites after initial variant and genotype filters
+</td>
+<td style="text-align:right;">
+3,117,961
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 8.30%">8.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Variants after initial filtering
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+6,829,373
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 18.30%">18.3</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+</div>
+<div id="initial-sample-quality-control" class="section level1">
+<h1>Initial sample quality control</h1>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Initial samples in vcf
+</td>
+<td style="text-align:right;">
+39,618
+</td>
+<td style="text-align:right;">
+16,486
+</td>
+<td style="text-align:right;">
+17,212
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Unable to obtain both phenotype and sequence information
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.00%">0.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Unknown phenotype
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.10%">0.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Low coverage or high contamination
+</td>
+<td style="text-align:right;">
+133
+</td>
+<td style="text-align:right;">
+72
+</td>
+<td style="text-align:right;">
+54
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after initial filter
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+39,451
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,414
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+17,158
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 99.60%">99.6</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p>We run the sample_qc function in hail and remove samples according to the following:</p>
+<ul>
+<li>Sample call rate <span class="math inline">\(&lt;\)</span> 0.93</li>
+<li>FREEMIX contamination (%) <span class="math inline">\(&gt;\)</span> 0.02</li>
+<li>Percentage chimeras (%) <span class="math inline">\(&gt;\)</span> 0.015</li>
+<li>Mean depth <span class="math inline">\(&lt;\)</span> 30</li>
+<li>Mean genotype quality <span class="math inline">\(&lt;\)</span> 55</li>
+</ul>
+<p>Thresholds used were based on plotting the distributions of these metrics. A full collection of plots can be found in the <a href="https://github.com/astheeggeggs/BipEx/tree/master/site/QC_plots/sample_plots">repository</a>. Here we show boxplots with overlaid scatterplots of the above metrics, split by sequencing batch, and coloured by location. The threshold for exclusion is shown as a dashed line.</p>
+<p><img src="QC_plots/sample_plots/03_callRate_by_batch.jpg" width="100%" /><img src="QC_plots/sample_plots/03_contamination_by_batch.jpg" width="100%" /><img src="QC_plots/sample_plots/03_chimeras_by_batch.jpg" width="100%" /><img src="QC_plots/sample_plots/03_dpMean_by_batch.jpg" width="100%" /><img src="QC_plots/sample_plots/03_gqMean_by_batch.jpg" width="100%" /></p>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Samples after initial filter
+</td>
+<td style="text-align:right;">
+39,451
+</td>
+<td style="text-align:right;">
+16,414
+</td>
+<td style="text-align:right;">
+17,158
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sample call rate &lt; 0.93
+</td>
+<td style="text-align:right;">
+185
+</td>
+<td style="text-align:right;">
+124
+</td>
+<td style="text-align:right;">
+53
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.50%">0.5</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+% FREEMIX contamination &gt; 0.02
+</td>
+<td style="text-align:right;">
+268
+</td>
+<td style="text-align:right;">
+146
+</td>
+<td style="text-align:right;">
+104
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.70%">0.7</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+% chimeric reads &gt; 0.015
+</td>
+<td style="text-align:right;">
+152
+</td>
+<td style="text-align:right;">
+49
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.40%">0.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mean DP &lt; 30
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.10%">0.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mean GQ &lt; 55
+</td>
+<td style="text-align:right;">
+56
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.10%">0.1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after sample QC filters
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+38,894
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,138
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,906
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 98.60%">98.6</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Following this step, we export high quality variants (allele frequency between 0.01 to 0.99 with high call rate (&gt; 0.98)) to plink format and prune to pseudo-independent SNPs using <code>--indep 50 5 2</code>. This pruned set of SNPs feeds into the next few stages of the QC pipeline.</p>
+<p><br></p>
+</div>
+<div id="sex-imputation" class="section level1">
+<h1>Sex imputation</h1>
+<p>We impute the sexes of the individuals with this pruned set of variants on the X chromosome, and create list of samples with incorrect or unknown sex as defined by:</p>
+<ul>
+<li>Sex is unknown in the phenotype files</li>
+<li>F-statistic <span class="math inline">\(&gt;\)</span> 0.6 and the sex is female in the phenotype file</li>
+<li>F-statistic <span class="math inline">\(&lt;\)</span> 0.6 and the sex is male in the phenotype file</li>
+</ul>
+<p>Here we show the distribution of the F-statistic, with the 0.6 threshold defining our sex impututation shown as a dashed line.</p>
+<p><img src="QC_plots/sample_plots/05_imputesex_histogram.jpg" width="100%" /></p>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Samples after sample QC filters
+</td>
+<td style="text-align:right;">
+38,894
+</td>
+<td style="text-align:right;">
+16,138
+</td>
+<td style="text-align:right;">
+16,906
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Samples with sex swap
+</td>
+<td style="text-align:right;">
+238
+</td>
+<td style="text-align:right;">
+147
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.60%">0.6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after sex swap removal
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+38,656
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+15,991
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,854
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 99.40%">99.4</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+</div>
+<div id="ibd" class="section level1">
+<h1>IBD</h1>
+<p>Using the <code>identity_by_descent</code> method in hail, we evaluate <span class="math inline">\(\hat{\pi}\)</span> between pairs of samples, and filter based on a threshold of 0.2 shown as a dashed line on the plot below.</p>
+<p><img src="QC_plots/sample_plots/06_IBD_plot.jpg" width="100%" /></p>
+<p>We then create a sample list of patients such that no pair has <span class="math inline">\(\hat{\pi} &gt;\)</span> 0.2.</p>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Samples after sample QC filters
+</td>
+<td style="text-align:right;">
+38,894
+</td>
+<td style="text-align:right;">
+16,138
+</td>
+<td style="text-align:right;">
+16,906
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Related samples for removal
+</td>
+<td style="text-align:right;">
+1,716
+</td>
+<td style="text-align:right;">
+792
+</td>
+<td style="text-align:right;">
+688
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 4.40%">4.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after IBD removal
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+37,178
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+15,346
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+16,218
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 95.60%">95.6</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+</div>
+<div id="pca" class="section level1">
+<h1>PCA</h1>
+<p>We next perform a number of principal component analysis (PCA) steps to ensure that we have matched cases and controls in our cleaned dataset.</p>
+<p><br></p>
+<div id="initial-pca" class="section level2">
+<h2>Initial PCA</h2>
+<p>We first run PCA on samples after removing relateds and those that passed initial QC, using the pruned set of variants.</p>
+<p><img src="QC_plots/sample_plots/09_PC1_PC2_collection.jpg" width="100%" /><img src="QC_plots/sample_plots/09_PC3_PC4_collection.jpg" width="100%" /><img src="QC_plots/sample_plots/09_PC5_PC6_collection.jpg" width="100%" /></p>
+<p><br></p>
+</div>
+<div id="pca-including-1000-genomes" class="section level2">
+<h2>PCA including 1000 genomes</h2>
+<p>Next, we included the 1000 genomes samples (minus the small subset of related individuals within 1000 geneomes), and rerun PCA after including those individuals. Plots of the first six principal components are shown below. 1000 genomes samples are coloured in dark blue.</p>
+<p><img src="QC_plots/sample_plots/10_PC1_PC2_1kg_collection.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC3_PC4_1kg_collection.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC5_PC6_1kg_collection.jpg" width="100%" /></p>
+<p>We restrict to the European subset of individuals to perform analysis. To do this, we train a random forest on the super populations labels of 1000 genomes and predict the super population that each of the BipEx samples. We denote strictly defined European subset as those with probability <span class="math inline">\(&gt;\)</span> 0.95 of being European according to the classifier. BipEx samples are coloured by their assignment or unsure if none of the classifier probabilities exceeded 0.95 in the following plots.</p>
+<p><img src="QC_plots/sample_plots/10_PC1_PC2_classify_EUR_strict.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC3_PC4_classify_EUR_strict.jpg" width="100%" /><img src="QC_plots/sample_plots/10_PC5_PC6_classify_EUR_strict.jpg" width="100%" /></p>
+<p>Samples not assigned to the European cluster were removed from downstream analysis.</p>
+<p>In addition, using a much looser definition of European, we restrict to US samples from MGH and Johns Hopkins, and run PCA. This enabled us to identify Ashkenazi Jewish clusters, and create a list of outliers (AJ or otherwise) for downstream removal or independent analysis.</p>
+<p>Run also ran a further collection of PCAs on:</p>
+<ul>
+<li>Strictly defined Europeans and Ashkenazi Jewish individuals
+<ul>
+<li>Use Ashkenazi Jewish cluster to train a random forest and determine if there are further Ashkenazi Jews in the remainder of the dataset.</li>
+</ul></li>
+<li>Strictly defined Europeans</li>
+</ul>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Samples after IBD removal
+</td>
+<td style="text-align:right;">
+37,178
+</td>
+<td style="text-align:right;">
+15,346
+</td>
+<td style="text-align:right;">
+16,218
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PCA based filters
+</td>
+<td style="text-align:right;">
+2,880
+</td>
+<td style="text-align:right;">
+1,120
+</td>
+<td style="text-align:right;">
+1,422
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 7.70%">7.7</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after population filters
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+34,298
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,226
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,796
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 92.30%">92.3</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p>However, upon restriction to the European cluster and after removal of AJs, we find that we have a dense case-control matched collection of samples and so decide not to analyse Swedes, Finns and Europeans (excluding Finns and Swedes) separately.</p>
+<p><br></p>
+</div>
+</div>
+<div id="final-variant-filtering" class="section level1">
+<h1>Final variant filtering</h1>
+<p>For our final variant filtering step, we first restrict to samples in the strictly defined European subset, filter to the unrelated list, and filter out samples with incorrectly defined sex or unknown sex, and run variant QC. We then evaluate a collection of variant metrics and remove variants that satisfy at least one of:</p>
+<ul>
+<li>Invariant site in cleaned sample subset</li>
+<li>Call rate <span class="math inline">\(&lt;\)</span> 0.97</li>
+<li>Control call rate <span class="math inline">\(&lt;\)</span> 0.97</li>
+<li>Case call rate <span class="math inline">\(&lt;\)</span> 0.97</li>
+<li><span class="math inline">\(|\)</span>Case call rate - Control call rate<span class="math inline">\(| &gt;\)</span> 0.02</li>
+<li><span class="math inline">\(p\)</span>-value for Hardy Weinberg Equilibrium <span class="math inline">\(&lt;\)</span> 10<sup>-6</sup></li>
+</ul>
+<p>The following plots show the 0.97 threshold for call rate and 0.02 threshold for difference in call rate between cases and controls respectively.</p>
+<p><img src="QC_plots/sample_plots/14_call_rate_cdf.jpg" width="100%" /><img src="QC_plots/sample_plots/14_call_rate_diff.jpg" width="100%" /></p>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Variants
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Variants after initial filter
+</td>
+<td style="text-align:right;">
+6,829,373
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Invariant sites after sample filters
+</td>
+<td style="text-align:right;">
+1,051,421
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 15.40%">15.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Overall variant call rate &lt; 0.97
+</td>
+<td style="text-align:right;">
+737,072
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 10.80%">10.8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Overall variant case call rate &lt; 0.97
+</td>
+<td style="text-align:right;">
+716,709
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 10.50%">10.5</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Overall variant control call rate &lt; 0.97
+</td>
+<td style="text-align:right;">
+743,659
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 10.90%">10.9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Difference between case and control variant call rate &lt; 0.02
+</td>
+<td style="text-align:right;">
+232,341
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 3.40%">3.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Variants failing HWE filter
+</td>
+<td style="text-align:right;">
+1,083,479
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 15.90%">15.9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Variants after filters
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+5,104,759
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 74.70%">74.7</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p>After these steps we plot the resulting changes in metrics across the samples in our data set. Each of the following plots splits the data by sequencing data and colours the points based on location. The first collection of subplots in each figure shows the variant metrics before sample removal, with the lower collection of subplots showing the resultant change after our QC steps.</p>
+<p><img src="QC_plots/sample_plots/15_nSingletonsbyBatchColLocation.jpg" width="100%" /><img src="QC_plots/sample_plots/15_rHetHomVarbyBatchColLocation.jpg" width="100%" /><img src="QC_plots/sample_plots/15_rInsertionDeletionbyBatchColLocation.jpg" width="100%" /><img src="QC_plots/sample_plots/15_rTiTvbyBatchColLocation.jpg" width="100%" /></p>
+<p><br></p>
+</div>
+<div id="final-sample-filtering" class="section level1">
+<h1>Final sample filtering</h1>
+<p>In this step we remove sample outliers after the variant cleaning in the previous step. Samples are removed if at least one of the following lies more that three standard deviations away from the mean:</p>
+<ul>
+<li>Ratio of transitions to transversions</li>
+<li>Ratio of heterozygous to homozygous variant</li>
+<li>Ratio of insertions to deletions</li>
+<li>Number of singletons</li>
+</ul>
+<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Filter
+</th>
+<th style="text-align:right;font-weight: bold;">
+Samples
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Cases
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Samples after population filters
+</td>
+<td style="text-align:right;">
+34,298
+</td>
+<td style="text-align:right;">
+14,226
+</td>
+<td style="text-align:right;">
+14,796
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 100.00%">100.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within batch Ti/Tv ratio outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within batch Het/HomVar ratio outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+150
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.40%">0.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within batch Insertion/Deletion ratio outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+93
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 0.30%">0.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Within location n singletons outside 3 standard deviations
+</td>
+<td style="text-align:right;">
+443
+</td>
+<td style="text-align:right;">
+151
+</td>
+<td style="text-align:right;">
+236
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 1.30%">1.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Samples after final sample filters
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+33,527
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+13,933
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,422
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #0081c2; width: 97.80%">97.8</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p>As a final step, we export common (allele frequency between 0.01 and 0.99) variants to plink format, prune, and evaluate final principal components for downstream analysis. The first six principal components are displayed below and coloured by case status.</p>
+<p><img src="QC_plots/sample_plots/17_PC1_PC2_final_PCs.jpg" width="100%" /><img src="QC_plots/sample_plots/17_PC3_PC4_final_PCs.jpg" width="100%" /><img src="QC_plots/sample_plots/17_PC5_PC6_final_PCs.jpg" width="100%" /></p>
+<p><br></p>
+<p>After all of this data cleaning, we save the resultant hail matrix tables for downstream analyses.</p>
+<p>The resultant composition of the samples was as follows:</p>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizoaffective
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizophrenia
+</th>
+<th style="text-align:right;font-weight: bold;">
+Other
+</th>
+<th style="text-align:right;font-weight: bold;">
+Unknown
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Aberdeen, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+521
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+322
+</td>
+<td style="text-align:right;">
+844
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Amsterdam, NED
+</td>
+<td style="text-align:right;">
+1,116
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+1,359
+</td>
+<td style="text-align:right;">
+2,569
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Baltimore, USA
+</td>
+<td style="text-align:right;">
+267
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+312
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+2,434
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,544
+</td>
+<td style="text-align:right;">
+5,009
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cambridge, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,656
+</td>
+<td style="text-align:right;">
+2,656
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+2,108
+</td>
+<td style="text-align:right;">
+65
+</td>
+<td style="text-align:right;">
+2,489
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1,006
+</td>
+<td style="text-align:right;">
+5,685
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dublin, IRE
+</td>
+<td style="text-align:right;">
+150
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+197
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Edinburgh, UK
+</td>
+<td style="text-align:right;">
+711
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+271
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+1,046
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+1,731
+</td>
+<td style="text-align:right;">
+144
+</td>
+<td style="text-align:right;">
+1,476
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1,082
+</td>
+<td style="text-align:right;">
+4,433
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+4,609
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4,530
+</td>
+<td style="text-align:right;">
+9,140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Umea, SWE
+</td>
+<td style="text-align:right;">
+441
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+426
+</td>
+<td style="text-align:right;">
+867
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Wurzburg, GER
+</td>
+<td style="text-align:right;">
+366
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+391
+</td>
+<td style="text-align:right;">
+769
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+13,933
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+277
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+4,785
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+80
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+30
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,422
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+33,527
+</td>
+</tr>
+</tbody>
+</table>
+<p>The bipolar subtype information of the curated samples is:</p>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder 1
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder 2
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder NOS
+</th>
+<th style="text-align:right;font-weight: bold;">
+Schizoaffective
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Total (including schizoaffective)
+</th>
+<th style="text-align:right;font-weight: bold;">
+Controls
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Aberdeen, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+322
+</td>
+<td style="text-align:right;">
+322
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Amsterdam, NED
+</td>
+<td style="text-align:right;">
+951
+</td>
+<td style="text-align:right;">
+155
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+1,135
+</td>
+<td style="text-align:right;">
+1,359
+</td>
+<td style="text-align:right;">
+2,494
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Baltimore, USA
+</td>
+<td style="text-align:right;">
+254
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+267
+</td>
+<td style="text-align:right;">
+41
+</td>
+<td style="text-align:right;">
+308
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+1,503
+</td>
+<td style="text-align:right;">
+279
+</td>
+<td style="text-align:right;">
+404
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+2,465
+</td>
+<td style="text-align:right;">
+2,544
+</td>
+<td style="text-align:right;">
+5,009
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cambridge, UK
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2,656
+</td>
+<td style="text-align:right;">
+2,656
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+1,301
+</td>
+<td style="text-align:right;">
+681
+</td>
+<td style="text-align:right;">
+62
+</td>
+<td style="text-align:right;">
+65
+</td>
+<td style="text-align:right;">
+2,173
+</td>
+<td style="text-align:right;">
+1,006
+</td>
+<td style="text-align:right;">
+3,179
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dublin, IRE
+</td>
+<td style="text-align:right;">
+150
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+161
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+168
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Edinburgh, UK
+</td>
+<td style="text-align:right;">
+317
+</td>
+<td style="text-align:right;">
+94
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+717
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+775
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+1,169
+</td>
+<td style="text-align:right;">
+350
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+144
+</td>
+<td style="text-align:right;">
+1,875
+</td>
+<td style="text-align:right;">
+1,082
+</td>
+<td style="text-align:right;">
+2,957
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+2,095
+</td>
+<td style="text-align:right;">
+1,595
+</td>
+<td style="text-align:right;">
+791
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4,610
+</td>
+<td style="text-align:right;">
+4,530
+</td>
+<td style="text-align:right;">
+9,140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Umea, SWE
+</td>
+<td style="text-align:right;">
+297
+</td>
+<td style="text-align:right;">
+141
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+441
+</td>
+<td style="text-align:right;">
+426
+</td>
+<td style="text-align:right;">
+867
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Wurzburg, GER
+</td>
+<td style="text-align:right;">
+201
+</td>
+<td style="text-align:right;">
+145
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+366
+</td>
+<td style="text-align:right;">
+391
+</td>
+<td style="text-align:right;">
+757
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+8,238
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,446
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,288
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+277
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,210
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+14,422
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+28,632
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>Taking a look at the breakdown of samples for which we have psychosis diagnosis information available:</p>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder with Psychosis
+</th>
+<th style="text-align:right;font-weight: bold;">
+Bipolar Disorder without Psychosis
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+454
+</td>
+<td style="text-align:right;">
+122
+</td>
+<td style="text-align:right;">
+576
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+993
+</td>
+<td style="text-align:right;">
+693
+</td>
+<td style="text-align:right;">
+1,686
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+978
+</td>
+<td style="text-align:right;">
+551
+</td>
+<td style="text-align:right;">
+1,529
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+1,925
+</td>
+<td style="text-align:right;">
+2,135
+</td>
+<td style="text-align:right;">
+4,060
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Wurzburg, GER
+</td>
+<td style="text-align:right;">
+55
+</td>
+<td style="text-align:right;">
+311
+</td>
+<td style="text-align:right;">
+366
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+4,405
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,812
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+8,217
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>Finally, we can look at the breakdown of samples in each of the age of onset categories:</p>
+<div id="age-at-first-impairment-1" class="section level4">
+<h4>Age at first impairment</h4>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &lt;12
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment 12-24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &gt;24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &lt;18
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment 18-40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Impairment &gt;40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘40’
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+61
+</td>
+<td style="text-align:right;">
+709
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+1,122
+</td>
+<td style="text-align:right;">
+401
+</td>
+<td style="text-align:right;">
+671
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+1,122
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+London, UK
+</td>
+<td style="text-align:right;">
+71
+</td>
+<td style="text-align:right;">
+899
+</td>
+<td style="text-align:right;">
+682
+</td>
+<td style="text-align:right;">
+1,652
+</td>
+<td style="text-align:right;">
+409
+</td>
+<td style="text-align:right;">
+1,084
+</td>
+<td style="text-align:right;">
+159
+</td>
+<td style="text-align:right;">
+1,652
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+222
+</td>
+<td style="text-align:right;">
+252
+</td>
+<td style="text-align:right;">
+495
+</td>
+<td style="text-align:right;">
+110
+</td>
+<td style="text-align:right;">
+320
+</td>
+<td style="text-align:right;">
+65
+</td>
+<td style="text-align:right;">
+495
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+153
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,830
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,286
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,269
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+920
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+2,075
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+274
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+3,269
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="age-at-first-symptoms-1" class="section level4">
+<h4>Age at first symptoms</h4>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &lt;12
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms 12-24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &gt;24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &lt;18
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms 18-40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Symptoms &gt;40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘40’
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cardiff, UK
+</td>
+<td style="text-align:right;">
+180
+</td>
+<td style="text-align:right;">
+647
+</td>
+<td style="text-align:right;">
+200
+</td>
+<td style="text-align:right;">
+1,027
+</td>
+<td style="text-align:right;">
+588
+</td>
+<td style="text-align:right;">
+409
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+1,027
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+221
+</td>
+<td style="text-align:right;">
+984
+</td>
+<td style="text-align:right;">
+648
+</td>
+<td style="text-align:right;">
+1,853
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+401
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,631
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+848
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+2,880
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+588
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+409
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+30
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,027
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="age-at-first-diagnosis-1" class="section level4">
+<h4>Age at first diagnosis</h4>
+<table class="table table-hover" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+Location
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &lt;12
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis 12-24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &gt;24
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘24’
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &lt;18
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis 18-40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Age First Diagnosis &gt;40
+</th>
+<th style="text-align:right;font-weight: bold;">
+Total ‘40’
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Boston, USA
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+156
+</td>
+<td style="text-align:right;">
+152
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+365
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Stockholm, SWE
+</td>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+755
+</td>
+<td style="text-align:right;">
+882
+</td>
+<td style="text-align:right;">
+1,682
+</td>
+<td style="text-align:right;">
+345
+</td>
+<td style="text-align:right;">
+1,093
+</td>
+<td style="text-align:right;">
+244
+</td>
+<td style="text-align:right;">
+1,682
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+45
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+755
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+882
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,682
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+501
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+1,245
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+301
+</td>
+<td style="text-align:right;font-weight: bold;color: white !important;background-color: #c24100 !important;">
+2,047
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

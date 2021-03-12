@@ -1,0 +1,194 @@
+---
+title: "Gene level analyses"
+output: 
+  html_document:
+    theme: united
+    highlight: tango
+    df_print: paged
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    css: "my-style.css"
+---
+
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+require(plotly)
+require(crosstalk)
+require(data.table)
+require(dplyr)
+require(DT)
+require(kableExtra)
+require(formattable)
+require(htmltools)
+```
+<br>
+We ran gene based tests to look for increased burden of damaging rare variation in cases. First, we annotate variants in the dataset as either 'synonymous', 'other-missense', 'damaging-missense', and 'PTV'. Here, we define a variant as 'damaging-missense' if both the polyphen prediction is 'probably damaging' and the SIFT prediction is 'deleterious'. Then, filtering variants to each of these consequence categories, we performed a number of tests to check for presense of enrichment of rare variation (minor allele count (MAC) $\leq$ 5). 
+
+Throughout we show QQ plots next to the gene-based manhattan plots of our results. For each consequence category, we display the results before and after the further restriction of variants not being present in the gnomAD non-psych samples. Non-damaging consequence categories are also included as negative controls. The top 20 genes in each plot by observed $p$-value are labelled.
+
+For the damaging missense and PTV tests, we also include Manhattan plots.
+
+Results for the Fisher's exact tests of MAC $\leq$ 5 not in the gnomAD non-psych samples can be explored in our [browser](http://bipex.broadinstitute.org/), take a look at in the 'Gene Result' table on the gene specific pages, or [here](http://bipex.broadinstitute.org/results) for all the genes. We applied the above tests to bipolar disorder (comprising bipolar disorder without a fine subclassification, bipolar disorder 1, bipolar disorder 2, and bipolar discorder not otherwise specificied), bipolar disorder 1, bipolar disorder 2, and bipolar disorder with and without psychosis. These plots are included in our paper, in Figure 3 and Figures S9-12,14-5. 
+
+## Fisher's exact test
+
+We ran a Fisher's exact test for each gene, grouping together all cohorts. The expected distribution of $p$-values is determined via permuation.
+
+
+### Bipolar Disorder
+#### Synonymous
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_synonymous.jpg")
+```
+<div style="clear: both;"></div> 
+#### Other missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_other_missense.jpg")
+```
+<div style="clear: both;"></div> 
+#### Damaging missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_damaging_missense.jpg")
+```
+<div style="clear: both;"></div> 
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_damaging_missense_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+#### PTV
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_MAC5_gnom_non_psych_ptv.jpg")
+```
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_ptv_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+
+<br>
+
+### Bipolar Disorder 1
+#### Synonymous
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_synonymous.jpg")
+```
+<div style="clear: both;"></div> 
+#### Other missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_other_missense.jpg")
+```
+<div style="clear: both;"></div> 
+#### Damaging missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_damaging_missense.jpg")
+```
+<div style="clear: both;"></div> 
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP1_damaging_missense_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+#### PTV
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP1_MAC5_gnom_non_psych_ptv.jpg")
+```
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP1_ptv_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+
+<br>
+
+### Bipolar Disorder 2
+#### Synonymous
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_synonymous.jpg")
+```
+<div style="clear: both;"></div> 
+#### Other missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_other_missense.jpg")
+```
+<div style="clear: both;"></div> 
+#### Damaging missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_damaging_missense.jpg")
+```
+<div style="clear: both;"></div> 
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP2_damaging_missense_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+#### PTV
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP2_MAC5_gnom_non_psych_ptv.jpg")
+```
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP2_ptv_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+
+<br>
+
+### Bipolar Disorder, with Psychosis
+#### Synonymous
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_synonymous.jpg")
+```
+<div style="clear: both;"></div> 
+#### Other missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_other_missense.jpg")
+```
+<div style="clear: both;"></div> 
+#### Damaging missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_damaging_missense.jpg")
+```
+<div style="clear: both;"></div> 
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BPPSY_damaging_missense_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+#### PTV
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BPPSY_MAC5_gnom_non_psych_ptv.jpg")
+```
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BPPSY_ptv_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+
+<br>
+
+### Bipolar Disorder, without Psychosis
+#### Synonymous
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_synonymous.jpg")
+```
+<div style="clear: both;"></div> 
+#### Other missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_other_missense.jpg")
+```
+<div style="clear: both;"></div> 
+#### Damaging missense
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_damaging_missense.jpg")
+```
+<div style="clear: both;"></div> 
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_no_PSY_damaging_missense_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+#### PTV
+```{r echo=FALSE, out.width = '54.87%', warning=FALSE, out.extra='style="float:left"', fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_BP_no_PSY_MAC5_gnom_non_psych_ptv.jpg")
+```
+```{r echo=FALSE, out.width = '100%', warning=FALSE, fig.align="center"}
+knitr::include_graphics("analysis_plots/gene_counts_qq/website_plots/fisher_MAC5_gnomad_non_psych_BP_no_PSY_ptv_manhattan.jpg")
+```
+<div style="clear: both;"></div> 
+
+<br>

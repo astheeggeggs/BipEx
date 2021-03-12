@@ -1,0 +1,37 @@
+---
+title: 'Analyses'
+output: 
+  html_document:
+    theme: united
+    highlight: tango
+    css: "my-style.css"
+---
+
+<br>
+
+<div class="well">
+
+Here, we detail each of the analyses that we carried out on the cleaned and curated BipEx dataset.
+<br>
+```{r init_samples, echo=FALSE, out.width = '30%', include=FALSE}
+recopy_figures <- TRUE
+if (recopy_figures)
+{
+	# Create directories for QC.
+	dir.create("QC_plots/sample_plots", showWarnings=FALSE, recursive=TRUE)
+	list.of.files <- list.files("../QC_plots/sample_plots/", "*jpg$",full.names=TRUE)
+	file.copy(list.of.files, "QC_plots/sample_plots/")
+	
+	# Create directories for gene level analyses
+	dir.create("analysis_plots/gene_counts_qq/website_plots", showWarnings=FALSE, recursive=TRUE)
+	list.of.files <- list.files("../analysis_plots/gene_counts_qq/website_plots","*jpg$",full.names=TRUE)
+	file.copy(list.of.files, "analysis_plots/gene_counts_qq/website_plots/")
+
+}
+```
+
+<div style="text-align: center;">
+<a href="https://astheeggeggs.github.io/BipEx/gene_analyses.html"  class="btn btn-primary btn-lg">Gene level</a>
+</div>
+
+</div>
