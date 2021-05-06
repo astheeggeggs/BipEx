@@ -20,7 +20,8 @@ knitr::include_graphics("bipex.svg")
 
 <div class="well">
 
-In this website and repository, we detail the collection of quality control steps and analyses applied to the BipEx collection of Bipolar exome cases and controls. Each step of the quality control pipeline is explained in detail and links to python code utilising the [hail](https://hail.is/) software developed in the lab, and R code used to generate the plots that you see when clicking around the website. A latex document outlining the steps in the QC pipeline is [here](https://github.com/astheeggeggs/BipEx/blob/master/scripts_BipEx/QC_BipEx/QC_pipeline_writeup/pipeline_writeup.tex).
+In this website and repository, we detail the collection of quality control steps and analyses applied to the BipEx collection of Bipolar exome cases and controls. Each step of the quality control pipeline is explained in detail and links to python code utilising the [hail](https://hail.is/) software developed in the lab, and R code used to generate the plots that you see when clicking around the website. A document outlining the steps in the QC pipeline is [here](https://github.com/astheeggeggs/BipEx/blob/master/scripts_BipEx/QC_BipEx/QC_pipeline_writeup/pipeline_writeup.pdf) (tex code [here](https://github.co\
+m/astheeggeggs/BipEx/blob/master/scripts_BipEx/QC_BipEx/QC_pipeline_writeup/pipeline_writeup.tex).
 <br>
 
 
