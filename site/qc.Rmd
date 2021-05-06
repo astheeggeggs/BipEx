@@ -27,7 +27,7 @@ source("../scripts_BipEx/QC_BipEx/r_functions_and_parameters/r_options_BipEx.r")
 options(dplyr.summarise.inform=F)
 ```
  <br> 
-On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying [code](https://github.com/astheeggeggs/BipEx/tree/master/scripts_BipEx/QC_BipEx) and a [document](https://github.com/astheeggeggs/BipEx/blob/master/scripts_BipEx/QC_BipEx/QC_pipeline_writeup/pipeline_writeup.tex) summarising the pipeline can be found on the BipEx github [repository](https://github.com/astheeggeggs/BipEx).
+On this page we detail the quality control (QC) pipeline for for the BipEx dataset. Further plots, the underlying [code](https://github.com/astheeggeggs/BipEx/tree/master/scripts_BipEx/QC_BipEx) and a [document](https://github.com/astheeggeggs/BipEx/blob/master/scripts_BipEx/QC_BipEx/QC_pipeline_writeup/pipeline_writeup.pdf) summarising the pipeline can be found on the BipEx github [repository](https://github.com/astheeggeggs/BipEx).
 
 We first summarise the collection of samples, splitting across cohorts and subtypes. In addtition to Bipolar cases, we also a collection of Schizophrenia cases that will serve as positive controls for our PTV burden analyses.
 
